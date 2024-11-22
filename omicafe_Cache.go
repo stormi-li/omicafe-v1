@@ -22,9 +22,10 @@ type FileCache struct {
 	cacheDir        string
 	itemMap         map[string]*list.Element
 	itemList        *list.List // 用于 LRU 策略
-	Cache_hit_num   uint64
-	Cache_fail_num  uint64
-	Cache_clear_num uint64
+	Cache_hit_num   int
+	Cache_fail_num  int
+	Cache_clear_num int
+	Cache_count     int
 }
 
 // 初始化文件缓存系统，读取现有缓存目录内容
@@ -121,6 +122,7 @@ func (fileCache *FileCache) Set(key string, data []byte) {
 		fileCache.curSize += fileSize
 	}
 	fileCache.lock.Unlock()
+	fileCache.Cache_count = len(fileCache.itemMap)
 }
 
 // 读取缓存，如果命中则返回 true
@@ -164,6 +166,7 @@ func (fileCache *FileCache) Del(key string) {
 	delete(fileCache.itemMap, filename)
 	fileCache.itemList.Remove(elem)
 	fileCache.lock.Unlock()
+	fileCache.Cache_count = len(fileCache.itemMap)
 }
 
 func (fileCache *FileCache) IsExist(key string) bool {
@@ -190,4 +193,5 @@ func (fileCache *FileCache) removeOldest() {
 	delete(fileCache.itemMap, cacheItem.filename)
 	fileCache.itemList.Remove(oldest)
 	fileCache.Cache_clear_num++
+	fileCache.Cache_count = len(fileCache.itemMap)
 }
