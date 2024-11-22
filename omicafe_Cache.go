@@ -16,12 +16,15 @@ type CacheItem struct {
 }
 
 type FileCache struct {
-	lock         sync.RWMutex
-	curSize      int
-	maxCacheSize int
-	cacheDir     string
-	itemMap      map[string]*list.Element
-	itemList     *list.List // 用于 LRU 策略
+	lock            sync.RWMutex
+	curSize         int
+	maxCacheSize    int
+	cacheDir        string
+	itemMap         map[string]*list.Element
+	itemList        *list.List // 用于 LRU 策略
+	Cache_hit_num   uint64
+	Cache_fail_num  uint64
+	Cache_clear_num uint64
 }
 
 // 初始化文件缓存系统，读取现有缓存目录内容
@@ -128,6 +131,7 @@ func (fileCache *FileCache) Get(key string) []byte {
 	// 转换路径并检查是否存在于缓存中
 	elem, found := fileCache.itemMap[filename]
 	if !found {
+		fileCache.Cache_fail_num++
 		return []byte{} // 缓存未命中
 	}
 	// 移动缓存项到列表前端
@@ -136,8 +140,10 @@ func (fileCache *FileCache) Get(key string) []byte {
 	cacheItem := elem.Value.(*CacheItem)
 	data, err := os.ReadFile(cacheItem.filepath)
 	if err != nil {
+		fileCache.Cache_fail_num++
 		return []byte{}
 	}
+	fileCache.Cache_hit_num++
 	return data
 }
 
@@ -183,4 +189,5 @@ func (fileCache *FileCache) removeOldest() {
 	os.Remove(cacheItem.filepath) // 删除磁盘上的缓存文件
 	delete(fileCache.itemMap, cacheItem.filename)
 	fileCache.itemList.Remove(oldest)
+	fileCache.Cache_clear_num++
 }
