@@ -12,7 +12,6 @@ func main() {
 	// for i := 0; i < 1000; i++ {
 	// 	cafe.Set("//afa/afa"+strconv.Itoa(i), []byte("fsffsdfsdfs"))
 	// }
-	
 	fmt.Println(cafe.CurrentSize())
 	fmt.Println(cafe.MaxSize)
 	data, has := cafe.Get("//afa/afa888")
