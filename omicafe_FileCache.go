@@ -16,10 +16,35 @@ type FileCache struct {
 
 // 初始化文件缓存
 func newFileCache(cacheDir string, maxSize int) *FileCache {
-	return &FileCache{
+	cache := &FileCache{
 		MaxSize:    maxSize,
 		FileMgr:    NewFileManager(cacheDir),
 		LRUManager: NewLRUManager(),
+	}
+	cache.initExistingFiles()
+
+	return cache
+}
+
+// 初始化已有缓存文件
+func (fc *FileCache) initExistingFiles() {
+	files := fc.FileMgr.ListFiles() // 获取文件列表及其大小
+	for _, file := range files {
+		// 如果文件大小超过最大容量，直接删除
+		if file.Size > fc.MaxSize {
+			_ = fc.FileMgr.DeleteFile(file.Key)
+			fc.CacheClearNum++
+			continue
+		}
+
+		// 如果当前容量足够，添加到 LRUManager
+		if fc.LRUManager.Size+file.Size <= fc.MaxSize {
+			fc.LRUManager.Add(file.Key, file.Size)
+		} else {
+			// 超出容量则清除
+			_ = fc.FileMgr.DeleteFile(file.Key)
+			fc.CacheClearNum++
+		}
 	}
 }
 
