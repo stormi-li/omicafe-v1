@@ -113,3 +113,10 @@ func (fc *FileCache) GetCacheClearCount() int {
 	defer fc.lock.RUnlock()
 	return fc.CacheClearNum
 }
+
+// 获取缓存条数
+func (fc *FileCache) GetCacheNum() int {
+	fc.lock.RLock()
+	defer fc.lock.RUnlock()
+	return fc.LRUManager.Count()
+}
