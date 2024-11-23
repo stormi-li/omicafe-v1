@@ -21,4 +21,9 @@ func main() {
 	fmt.Println(cafe.GetCacheHitCount())
 	fmt.Println(cafe.GetCacheClearCount())
 	fmt.Println(cafe.GetCacheMissCount())
+	cafe.Del("//afa/afa888")
+	fmt.Println(cafe.GetCacheNum())
+	fmt.Println(cafe.GetCacheHitCount())
+	fmt.Println(cafe.GetCacheClearCount())
+	fmt.Println(cafe.GetCacheMissCount())
 }
