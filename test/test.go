@@ -7,23 +7,11 @@ import (
 )
 
 func main() {
-	cafe := omicafe.NewFileCache("cache", 5*1024)
-	// cafe.Set("//afa/afa", []byte("fsfs"))
-	// for i := 0; i < 1000; i++ {
-	// 	cafe.Set("//afa/afa"+strconv.Itoa(i), []byte("fsffsdfsdfs"))
-	// }
-	fmt.Println(cafe.CurrentSize())
-	fmt.Println(cafe.MaxSize)
-	data, has := cafe.Get("//afa/afa888")
+	cafe := omicafe.NewFileCache("cache", 100*1024*1024)
+	key := "name"
+	value := []byte("stormi-li")
+	cafe.Set(key, value)
+	data, has := cafe.Get(key)
 	fmt.Println(has, string(data))
-	cafe.Get("//afa/afa-1")
-	fmt.Println(cafe.GetCacheNum())
-	fmt.Println(cafe.GetCacheHitCount())
-	fmt.Println(cafe.GetCacheClearCount())
-	fmt.Println(cafe.GetCacheMissCount())
-	cafe.Del("//afa/afa888")
-	fmt.Println(cafe.GetCacheNum())
-	fmt.Println(cafe.GetCacheHitCount())
-	fmt.Println(cafe.GetCacheClearCount())
-	fmt.Println(cafe.GetCacheMissCount())
+	cafe.Del(key)
 }
