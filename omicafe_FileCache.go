@@ -51,10 +51,6 @@ func (fc *FileCache) initExistingFiles() {
 // 设置缓存文件
 func (fc *FileCache) Set(key string, data []byte) {
 	size := len(data)
-	if size > fc.MaxSize {
-		return // 文件太大，直接丢弃
-	}
-
 	fc.lock.Lock()
 	defer fc.lock.Unlock()
 
@@ -65,6 +61,10 @@ func (fc *FileCache) Set(key string, data []byte) {
 			_ = fc.FileMgr.DeleteFile(oldest.Key)
 			fc.CacheClearNum++ // 清除计数
 		}
+	}
+
+	if size > fc.MaxSize {
+		return // 文件太大，直接丢弃
 	}
 
 	// 写入文件并更新 LRU
